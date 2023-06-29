@@ -268,14 +268,16 @@ impl<N: RealFieldCopy> From<ECEF<N>> for WGS84<N> {
 
 #[cfg(test)]
 impl Arbitrary for WGS84<f64> {
-    fn arbitrary<G: Gen>(g: &mut G) -> WGS84<f64> {
-        use rand::Rng;
-        let lat = g.gen_range(-90.0, 90.0);
-        let lon = g.gen_range(-180.0, 180.0);
+    fn arbitrary(_: &mut Gen) -> WGS84<f64> {
+        use rand::distributions::Uniform;
+        use rand::{thread_rng, Rng};
+        let mut rng = thread_rng();
+        let lat = rng.sample(Uniform::new(-90.0, 90.0));
+        let lon = rng.sample(Uniform::new(-180.0, 180.0));
         // NOTE: Minimum altitude is radius of the earth, however, due to
         // float precision we have shrunk that down a bit, the values
         // below might still cause problems
-        let alt = g.gen_range(-6300000.0, 10000000.0);
+        let alt = rng.sample(Uniform::new(-6300000.0, 10000000.0));
 
         WGS84::from_degrees_and_meters(lat, lon, alt)
     }
